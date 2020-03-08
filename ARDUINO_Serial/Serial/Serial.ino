@@ -28,30 +28,30 @@ int aiGetClass(void){
 
 int aiInteraceLoop(void){
     if (mySerial.available() > 0) {   // 데이터가 있으면
-    char data = mySerial.read();  // 씨리얼 포트로 들어온 데이터를 버퍼에 저장
+    char data = mySerial.read();      // 씨리얼 포트로 들어온 데이터를 버퍼에 저장
     buffer[0] = data;
-    buffer[1] = 0;                                    // 버퍼마지막데이터 끝을 0으로 만들기
+    buffer[1] = 0;                    // 버퍼마지막데이터 끝을 0으로 만들기
     Serial.write(buffer);
 
-    cls = atoi(buffer); // change to int
-    if(cls > 9) cls=0;  // 0~9 0 is defalt
-
- /*  
- // example  
-    if (strcmp(buffer, "1") == 0) {  
-       Serial.println("LED1");                          // 들어온 데이터가 1이면
- 
-    } else if (strcmp(buffer, "2") == 0) {              // 들어온 데이터가 2이면
-       Serial.println("LED2");
-  
-    } else {
-  
-    }
-*/
+    cls = atoi(buffer);               // int 로 변환
+    if(cls > 9) cls=0;                // 0~9의 값만 사용함, 9보다 크면 0으로 초기화
+    
     }
 }
 
 void loop() {
   aiInteraceLoop();
+//Example
+  if(aiGetClass() == 1){
+      Serial.println("CLASS1");                          // 들어온 데이터가 1이면
+      digitalWrite(LED8, LOW);    
+      digitalWrite(LED9, HIGH);                                                    
+  }else if (aiGetClass() == 2){
+      Serial.println("CLASS2");                          // 들어온 데이터가 2이면
+      digitalWrite(LED8, HIGH);   
+      digitalWrite(LED9, LOW);    
+  }else{
+                                                         // 정의되지 않은 CLASS의 경우 Error
+  }
    
 }
