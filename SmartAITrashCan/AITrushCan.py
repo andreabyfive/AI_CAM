@@ -122,7 +122,7 @@ class MyWindow(QMainWindow, aiMainUI):
                     print("[9] second target {}".format(prediction[0][8]))
                 else:
                     self.resultVal = "0"
-                    print("no match")
+                    print("no match!")
             except ValueError as ve:
                 print("*********\nprediction error:{0}".format(ve))
             except:
