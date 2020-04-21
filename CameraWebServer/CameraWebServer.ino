@@ -15,8 +15,8 @@
 
 #include "camera_pins.h"
 
-const char *ssid = "yourAP";
-const char *password = "yourPassword";
+const char *ssid = "OBYONE";
+const char *password = "10197024";
 
 void startCameraServer();
 
@@ -84,17 +84,20 @@ void setup() {
   s->set_hmirror(s, 1);
 #endif
 
-  WiFi.softAP(ssid);
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(myIP);
-  
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
   Serial.println("");
   Serial.println("WiFi connected");
 
   startCameraServer();
 
- 
+  Serial.print("Camera Ready! Use 'http://");
+  Serial.print(WiFi.localIP());
+  Serial.println("' to connect");
 }
 
 void loop() {
