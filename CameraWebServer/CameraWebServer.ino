@@ -14,11 +14,15 @@
 #define CAMERA_MODEL_AI_THINKER
 
 #include "camera_pins.h"
-
+const char *ssid_ = "RUNCODE";
 const char *ssid = "OBYONE";
 const char *password = "10197024";
 
 void startCameraServer();
+int checkID();
+char* getSSID();
+char* getPW();
+void setDevideIPDone();
 
 void setup() {
   Serial.begin(115200);
@@ -84,7 +88,19 @@ void setup() {
   s->set_hmirror(s, 1);
 #endif
 
-  WiFi.begin(ssid, password);
+  WiFi.softAP(ssid_);
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  
+  Serial.println("");
+  Serial.println("WiFi connected");
+
+  startCameraServer();
+
+  while(!(checkID() == 0x3));
+
+  WiFi.begin(getSSID(), getPW());
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -93,11 +109,23 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
 
-  startCameraServer();
+  //startCameraServer();
+  setDevideIPDone();
 
   Serial.print("Camera Ready! Use 'http://");
   Serial.print(WiFi.localIP());
   Serial.println("' to connect");
+}
+
+char IP[] = "xxx.xxx.xxx.xxx";          // buffer
+char* IpAddress2char(const IPAddress& ip)
+{
+  sprintf(IP, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+  return IP;
+}
+
+char* getDevideIP(){
+  return IpAddress2char(WiFi.localIP());
 }
 
 void loop() {

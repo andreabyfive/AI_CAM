@@ -34,6 +34,11 @@
 #define FACE_COLOR_CYAN   (FACE_COLOR_BLUE | FACE_COLOR_GREEN)
 #define FACE_COLOR_PURPLE (FACE_COLOR_BLUE | FACE_COLOR_RED)
 
+int check=0;
+char run_ssid[32]={0,};
+char run_pw[32]={0,};
+char* getDevideIP();
+
 typedef struct {
   size_t size; //number of values used for filtering
   size_t index; //current value index
@@ -482,6 +487,33 @@ static esp_err_t cmd_handler(httpd_req_t *req) {
     return ESP_FAIL;
   }
 
+  if (!strcmp(variable, "ssid")) {
+    //    printf("var:%s\n",variable);
+    printf("%s\n", value);
+    strcpy(run_ssid,value);
+    check += 0x1;
+    return httpd_resp_send(req, "200 OK", strlen("200 OK"));
+  }
+   if (!strcmp(variable, "pw")) {
+    //    printf("var:%s\n",variable);
+    printf("%s\n", value);
+    strcpy(run_pw,value);
+    check += 0x2;
+    return httpd_resp_send(req, "200 OK", strlen("200 OK"));
+  }
+   if (!strcmp(variable, "gip")) {
+    //    printf("var:%s\n",variable);
+    printf("%s\n", value);
+    //strcpy(run_pw,value)
+    //check += 0x4;
+    if(check == 0x7){
+      return httpd_resp_send(req,getDevideIP(), strlen(getDevideIP()));
+    }else{
+      return httpd_resp_send(req, "NOK", strlen("NOK"));
+    }
+    
+  }
+
   int val = atoi(value);
   sensor_t * s = esp_camera_sensor_get();
   int res = 0;
@@ -528,9 +560,11 @@ static esp_err_t cmd_handler(httpd_req_t *req) {
   else if (!strcmp(variable, "result")) {
     //    printf("var:%s\n",variable);
     printf("%d\n", val);
+    //id=val;
     //res= 0;
     return httpd_resp_send(req, "200 OK", strlen("200 OK"));
   }
+   
   else {
     res = -1;
   }
@@ -543,6 +577,64 @@ static esp_err_t cmd_handler(httpd_req_t *req) {
   httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
   return httpd_resp_send(req, NULL, 0);
 }
+
+void setDevideIPDone(){
+  check += 0x4;
+}
+
+int checkID(){
+  return check;
+}
+char* getSSID(){
+  return run_ssid;
+}
+char* getPW(){
+  return run_pw;
+}
+
+static esp_err_t interface_handler(httpd_req_t *req) {
+  printf("interface\n");
+  char*  buf;
+  size_t buf_len;
+  char variable[32] = {0,};
+  char value[32] = {0,};
+
+  buf_len = httpd_req_get_url_query_len(req) + 1;
+  if (buf_len > 1) {
+    buf = (char*)malloc(buf_len);
+    if (!buf) {
+      httpd_resp_send_500(req);
+      return ESP_FAIL;
+    }
+    if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+      //           printf("%s\n",buf);
+      if (httpd_query_key_value(buf, "var", variable, sizeof(variable)) == ESP_OK &&
+          httpd_query_key_value(buf, "val", value, sizeof(value)) == ESP_OK) {
+      } else {
+        free(buf);
+        httpd_resp_send_404(req);
+        return ESP_FAIL;
+      }
+    } else {
+      free(buf);
+      httpd_resp_send_404(req);
+      return ESP_FAIL;
+    }
+    free(buf);
+  } else {
+    httpd_resp_send_404(req);
+    return ESP_FAIL;
+  }
+  printf("%s\n",value);
+  if (!strcmp(variable, "ssid")) {
+    //    printf("var:%s\n",variable);
+    printf("%s\n", value);
+    
+    return httpd_resp_send(req, "200 OK", strlen("200 OK"));
+  }
+   
+}
+
 
 static esp_err_t status_handler(httpd_req_t *req) {
   static char json_response[1024];
@@ -634,6 +726,12 @@ void startCameraServer() {
     .user_ctx  = NULL
   };
 
+  httpd_uri_t inteface_uri = {
+    .uri       = "/inteface",
+    .method    = HTTP_GET,
+    .handler   = interface_handler,
+    .user_ctx  = NULL
+  };
 
   ra_filter_init(&ra_filter, 20);
 
@@ -659,6 +757,7 @@ void startCameraServer() {
     httpd_register_uri_handler(camera_httpd, &cmd_uri);
     httpd_register_uri_handler(camera_httpd, &status_uri);
     httpd_register_uri_handler(camera_httpd, &capture_uri);
+    httpd_register_uri_handler(camera_httpd, &inteface_uri);
   }
 
   config.server_port += 1;
