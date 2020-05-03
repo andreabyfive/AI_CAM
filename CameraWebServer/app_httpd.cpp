@@ -491,21 +491,21 @@ static esp_err_t cmd_handler(httpd_req_t *req) {
     //    printf("var:%s\n",variable);
     printf("%s\n", value);
     strcpy(run_ssid,value);
-    check += 0x1;
+    check |= 0x1;
     return httpd_resp_send(req, "200 OK", strlen("200 OK"));
   }
    if (!strcmp(variable, "pw")) {
     //    printf("var:%s\n",variable);
     printf("%s\n", value);
     strcpy(run_pw,value);
-    check += 0x2;
+    check |= 0x2;
     return httpd_resp_send(req, "200 OK", strlen("200 OK"));
   }
    if (!strcmp(variable, "gip")) {
     //    printf("var:%s\n",variable);
     printf("%s\n", value);
     //strcpy(run_pw,value)
-    //check += 0x4;
+    //check |= 0x4;
     if(check == 0x7){
       return httpd_resp_send(req,getDevideIP(), strlen(getDevideIP()));
     }else{
@@ -579,7 +579,7 @@ static esp_err_t cmd_handler(httpd_req_t *req) {
 }
 
 void setDevideIPDone(){
-  check += 0x4;
+  check |= 0x4;
 }
 
 int checkID(){
