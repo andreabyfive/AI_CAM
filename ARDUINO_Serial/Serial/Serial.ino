@@ -56,22 +56,22 @@ void loop() {
   int tmp = 0;
   if (aiInteraceLoop() == 1) {
     //Example
-    if (aiGetClass() == 1) {
+    if (aiGetClass() == 2) {
     //  if (tmp == 1) {
-        myservo.write(0);
+        myservo.write(110);
         tmp = 0;
     //  }
 
-      Serial.println("B");                          // 들어온 데이터가 0이면
+      Serial.println("closed");                          // 들어온 데이터가 0이면
      
     }
-    if (aiGetClass() == 2) {
+    if (aiGetClass() == 1) {
    //   if (tmp == 0) {
-        myservo.write(110);
+        myservo.write(0);
         tmp = 1;
     //  }
 
-      Serial.println("W");                          // 들어온 데이터가 1이면
+      Serial.println("open");                          // 들어온 데이터가 1이면
     
     }
   }

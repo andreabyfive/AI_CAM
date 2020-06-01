@@ -14,9 +14,8 @@
 #define CAMERA_MODEL_AI_THINKER
 
 #include "camera_pins.h"
-const char *ssid_ = "RUNCODING";
-const char *ssid = "OBYONE";
-const char *password = "10197024";
+const char *ssid_ = "RUNCODING_0004";
+
 
 void startCameraServer();
 int checkID();
